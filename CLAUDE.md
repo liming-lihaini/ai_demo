@@ -143,8 +143,8 @@ Controller → Service → Repository → Model
 
 1. `git pull origin main`
 2. 创建 worktree：`git worktree add -b feature/issue-{N} .claude/worktrees/issue-{N} main`
-3. 复制 stages/pipeline-state-template.md → .claude/pipeline-state-{ISSUE名称}.md，ISSUE名称提取用户需要开发的问题名称  在文件中填入 Task + 技术栈 + 架构约束
-4. 复制 stages/pipeline-log-template.md → .claude/pipeline-log-{ISSUE名称}.md
+3. 复制 stages/pipeline-state-template.md → .claude/pipeline-state-{issue编号}.md，  在文件中填入 Task + 技术栈 + 架构约束
+4. 复制 stages/pipeline-log-template.md → .claude/pipeline-log-{issue编号}.md
 5. 记录 Pipeline 版本到 state
 
 
@@ -183,9 +183,9 @@ understand → design → [review] → plan → [review] → implement → [revi
    [review agent] {被评审阶段} - {Issue 标题}
 
    运行 /pipeline-load review。
-   完成后严格遵循 stage 文件执行。
+   完成后严格遵循 stage 文件执行
    ```
-   **主 agent 职责**：review 完成后，主 agent 将评审结论写入 pipeline-state.md Current Stage > 评审 section（状态、轮次、反馈）
+   **主 agent 职责**：review 完成后，主 agent 将评审结论写入 pipeline-state-{issue名称}.md Current Stage > 评审 section（状态、轮次、反馈）
 7. review 不通过 → 反馈写入 state → 修复 → 最多重试 2 次 → 人工介入
 8. 子 agent 失败 → 重试 1 次 → 仍失败 → 人工介入
 9. Boundaries 冲突 → 停止
@@ -196,7 +196,7 @@ understand → design → [review] → plan → [review] → implement → [revi
 ## 断点续跑
 
 session 中断后重新启动：
-1. 读 pipeline-state-{ISSUE名称}.md 的 Current Stage
+1. 读 pipeline-state-{issue编号}.md 的 Current Stage
 2. 从该阶段重新执行（已完成阶段产出保留）
 3. 日志标注"恢复执行"
 

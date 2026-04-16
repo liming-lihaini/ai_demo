@@ -14,8 +14,8 @@
 | 性能优化 | 基线数据、目标指标、测量方法 | 需要读取监控相关 |
 | 依赖升级 | 升级原因、Breaking Changes、兼容性 | 需要读取依赖使用点 |
 
-在 pipeline-state.md Task section 开头标注 Issue 类型，后续阶段据此调整。
-
+在 pipeline-state-{ISSUE名称}.md Task section 开头标注 Issue 类型，后续阶段据此调整。
+sssss
 ## 需求冲突处理
 
 如果发现以下冲突，记入 Open Questions 🔴 阻塞，不自行裁决：
@@ -27,7 +27,7 @@
 
 ## Act
 
-1. 写入 pipeline-state.md：
+1. 写入 pipeline-state-{ISSUE名称}.md：
 
 **Task section**:
 - Issue 类型: {新功能/Bug修复/重构/性能优化/依赖升级}
@@ -54,7 +54,7 @@
 - 按 downstream 消费顺序排列（design 先看的排前面）
 
 2. 写 Issue 摘要（知识回流）：
-   docs/current/issues/issue-{N}-{title}.md，按 docs/current/issues/README.md 模板
+   docs/issues/ISSUE-{title}.md，按 docs/issues/README.md 模板
 
 ## Verify
 
@@ -70,6 +70,6 @@
 ## 常见错误
 
 - ❌ "实现登录功能" → ✅ "实现用户登录，支持手机号+验证码和邮箱+密码两种方式"
-- ❌ References 里写 "见 decisions/README.md" → ✅ 直接写 "docs/current/decisions/adr-012-auth.md"
+- ❌ References 里写 "见 decisions/README.md" → ✅ 直接写 "docs/issues/{ISSUE名称}/decisions/adr.md"
 - ❌ 跳过 Issue 类型判断 → ✅ 先判断类型再确定关注重点
 - ❌ 发现矛盾但不记录 → ✅ 记入 Open Questions，标注矛盾双方
