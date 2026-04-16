@@ -2,46 +2,45 @@
 
 ## 项目概况
 
-Agentic Coding Platform — 通用 agent 任务执行平台，封装 Claude Code CLI 提供托管执行环境。
-当前阶段: MVP (v1.0) | 设计原则: Modular Monolith | Reuse First | Fast Validation
+文件管理系统 — 桌面端本地文件管理工具，提供文件目录管理、文件操作、文件预览、在线Markdown编写功能。
+当前阶段: MVP (v1.0) | 设计原则: 前后端不分离 | 离线优先 | 快速验证
 
 ## 项目结构
 
-agent-infra/
-├── cmd/            # 程序入口
+file-manager/
+├── cmd/            # 程序入口 (main方法)
 ├── internal/
-│ ├── api/          # HTTP 层: handler, middleware, router
+│ ├── api/          # HTTP层: handler, middleware, router
 │ ├── service/      # 业务逻辑核心，事务边界
 │ ├── repository/   # 数据访问层
-│ ├── model/        # GORM 模型定义
-│ ├── scheduler/    # 调度引擎
-│ ├── executor/     # 执行引擎: Job 生命周期, Pod 管理
+│ ├── model/        # 数据模型定义
 │ ├── config/       # 配置加载
-│ ├── migration/    # 数据库迁移
-│ ├── monitoring/   # 监控采集
-│ └── seed/         # 种子数据
-├── pkg/            # 公共工具
-├── web/            # 前端: React + Ant Design
-└── deploy/         # K8s manifests, Dockerfiles
+│ ├── storage/      # 文件存储服务
+│ ├── preview/      # 预览服务: 文档/图片/音视频转换
+│ ├── md/           # Markdown解析与导出
+│ └── scheduler/    # 定时任务: 回收站清理
+├── web/            # 前端: Vue 3 + Element Plus
+├── sql/            # SQLite初始化脚本
+└── deploy/         # 打包配置 (exe)
 
 ## 架构概览
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   Frontend   │────▶│    API       │────▶│   Service    │
-│  React+AntD  │     │  Gin+Router │     │  业务逻辑核心  │
+│  Vue3+EltPl  │     │  SpringBoot  │     │  业务逻辑核心  │
 └─────────────┘     └─────────────┘     └──────┬──────┘
                                                │
                                     ┌──────────┼──────────┐
                                     ▼          ▼          ▼
                               ┌──────────┐ ┌──────┐ ┌──────────┐
-                              │Repository│ │Redis │ │Scheduler │
-                              │ GORM+DB  │ │Cache │ │ 调度引擎  │
+                              │SQLite+FS │ │Cache │ │Scheduler │
+                              │  本地存储 │ │本地缓存 │ │ 定时任务  │
                               └──────────┘ └──────┘ └────┬─────┘
                                                         │
                                                   ┌─────▼─────┐
-                                                  │ Executor   │
-                                                  │ K8s+Pod   │
+                                                  │  打包exe  │
+                                                  │ Launch4j  │
                                                   └───────────┘
 ```
 
@@ -49,26 +48,12 @@ agent-infra/
 
 | 概念 | 含义 |
 |------|------|
-| Task | 用户提交的执行任务，包含代码仓库、分支、环境变量 |
-| Job | Task 的一次执行实例，有状态机（pending→running→succeeded/failed） |
-| Pod | Job 的运行容器，K8s 管理，有资源限制和超时 |
-| Provider | Agent 运行时配置，定义 MCP 工具、环境变量、模型选择 |
-| Capability | Agent 能力注册，定义工具集合和权限边界 |
-| Intervention | 人工干预点，Job 在特定阶段暂停等待人工审批 |
-| Checkpoint | 执行快照，Job 可从任意 checkpoint 恢复执行 |
+| 目录 | 用于组织文件的层级结构，支持嵌套创建/移动/删除 |
+| 文件 | 存储在目录中的具体文档，支持上传/下载/预览 |
+| 回收站 | 删除文件临时存储，30天后自动清除 |
+| MD文件 | Markdown格式文本，支持实时预览/导出 |
+| 预览转换 | Office文档转换为PDF后预览 |
 
-## 分层约束
-
-```
-Handler → Service → Repository → Model
-```
-
-- Handler: 参数校验 + 响应格式化，不含业务逻辑
-- Service: 业务逻辑核心，事务边界，可调用多个 Repository
-- Repository: 数据访问层，封装 SQL，不含业务逻辑
-- Model: GORM 模型定义，不含方法
-
-禁止路径: Handler → Repository, Repository → Service, Scheduler/Executor → Database
 
 ## 启动
 

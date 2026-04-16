@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Write",
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash"
+    ]
+  },
+  "skills": {
+    "create_prd": {
+      "path": "skills/create_prd",
+      "enabled": true
+    },
+    "prd_2_trd": {
+      "path": "skills/prd_for_trd",
+      "enabled": true
+    }
+  }
+}

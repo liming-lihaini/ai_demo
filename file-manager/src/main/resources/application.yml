@@ -1,0 +1,71 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: file-manager
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:db/fileManager.db
+    hikari:
+      maximum-pool-size: 1
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+  web:
+    resources:
+      static-locations: classpath:/static,file:./storage/files
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.filemanager.model
+
+# 存储配置
+storage:
+  path: ./storage/files
+  temp-path: ./storage/temp
+  cache-path: ./storage/cache
+
+# 应用配置
+app:
+  upload:
+    max-size: 100MB
+    max-batch: 50
+    allowed-extensions:
+      - doc
+      - docx
+      - xls
+      - xlsx
+      - ppt
+      - pptx
+      - pdf
+      - txt
+      - md
+      - jpg
+      - jpeg
+      - png
+      - gif
+      - bmp
+      - mp3
+      - wav
+      - mp4
+      - avi
+  trash:
+    keep-days: 30
+  log:
+    keep-days: 90
+
+# 日志配置
+logging:
+  level:
+    com.filemanager: INFO
+  file:
+    name: logs/file-manager.log
+  pattern:
+    console: "[%d{yyyy-MM-dd HH:mm:ss}] [%level] [%logger{36}] %msg"
+    file: "[%d{yyyy-MM-dd HH:mm:ss}] [%level] [%logger{36}] %msg"
