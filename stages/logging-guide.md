@@ -35,7 +35,7 @@ QR-3 下游可用性 | {合规/偏差}: {详情}
 
 ### QR 检查方法
 
-QR-0 决策一致性: 产出是否体现了 pipeline-state.md Decisions 中所有已做决策？无否决方案出现
+QR-0 决策一致性: 产出是否体现了 pipeline-state-{ISSUE名称}.md Decisions 中所有已做决策？无否决方案出现
 QR-1 边界合规: 产出的文件/功能是否全部在 Boundaries 范围之内？无硬约束违反？
 QR-2 验收可验证: 产出中的每个自检项是否有可执行的验证方法（不能是"功能正常"这种模糊描述）
 QR-3 下游可用性: 下一阶段的 agent 仅凭 state + 产出能否开始工作？是否需要回头补信息？
@@ -50,7 +50,7 @@ SR-2 加载完整性: 日志引用了 stage 文件和 prompt 知识文件列表�
 SR-3 Handoff 检查: 日志"输入"段有 Handoff 子项，且复述了上一阶段产出，**且显式确认"信息充分，可以开始本阶段工作"或标注缺失项**
 SR-4 Act 步骤遵循: 日志"过程"段覆盖了 stage 文件 Act section 的所有步骤
 SR-5 Verify 执行: 日志中每个自检项有具体证据（不是只打了勾）
-SR-6 State 更新: pipeline-state.md Current Stage 的产出、自检已填充
+SR-6 State 更新: pipeline-state-{ISSUE名称}.md Current Stage 的产出、自检已填充
 SR-7 越界: 无 Boundaries 范围外的文件修改
 SR-8 知识回流: understand 写了 Issue 摘要 / design 写了 ADR / implement 更新了 knowledge 或修改了 pipeline 文件（不适用时 N/A）
 

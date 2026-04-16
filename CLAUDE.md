@@ -7,21 +7,38 @@
 
 ## 项目结构
 
-file-manager/
-├── cmd/            # 程序入口 (main方法)
-├── internal/
-│ ├── api/          # HTTP层: handler, middleware, router
-│ ├── service/      # 业务逻辑核心，事务边界
-│ ├── repository/   # 数据访问层
-│ ├── model/        # 数据模型定义
-│ ├── config/       # 配置加载
-│ ├── storage/      # 文件存储服务
-│ ├── preview/      # 预览服务: 文档/图片/音视频转换
-│ ├── md/           # Markdown解析与导出
-│ └── scheduler/    # 定时任务: 回收站清理
-├── web/            # 前端: Vue 3 + Element Plus
-├── sql/            # SQLite初始化脚本
-└── deploy/         # 打包配置 (exe)
+file-manager/                           # 主项目目录
+├── pom.xml                            # Maven 构建配置
+├── src/main/
+│   ├── java/com/filemanager/
+│   │   ├── Application.java           # 启动类 (main方法)
+│   │   ├── config/                   # 配置层
+│   │   │   └── DatabaseInitializer.java # 数据库初始化
+│   │   ├── controller/               # HTTP接口层 (空)
+│   │   ├── model/                   # 数据模型层
+│   │   │   ├── Directory.java        # 目录实体
+│   │   │   ├── FileInfo.java         # 文件实体
+│   │   │   └── User.java            # 用户实体
+│   │   ├── repository/               # 数据访问层 (空)
+│   │   ├── service/                 # 业务逻辑层 (空)
+│   │   └── util/                    # 工具类 (空)
+│   ├── resources/
+│   │   ├── application.yml           # 应用配置
+│   │   ├── mapper/                  # MyBatis映射 (空)
+│   │   └── static/                 # 静态资源 (空)
+│   └── webapp/
+│       ├── src/
+│       │   ├── main.js              # 前端入口
+│       │   ├── router/              # 路由配置
+│       │   ├── api/                 # 前端API调用
+│       │   ├── components/           # Vue组件 (空)
+│       │   ├── views/               # 页面视图 (空)
+│       │   └── assets/              # 静态资源
+│       ├── index.html
+│       ├── vite.config.js           # Vite配置
+│       └── package.json             # 前端依赖
+├── target/                           # 编译输出目录
+└── db/                              # SQLite数据库文件 (运行时生成)
 
 ## 架构概览
 
@@ -54,14 +71,82 @@ file-manager/
 | MD文件 | Markdown格式文本，支持实时预览/导出 |
 | 预览转换 | Office文档转换为PDF后预览 |
 
+## 架构约束
+
+### 分层约束
+
+```
+Controller → Service → Repository → Model
+```
+
+| 层级 | 职责 | 禁止操作 |
+|------|------|----------|
+| Controller | 参数校验 + 响应格式化 + 参数组装 | 禁止执行业务逻辑 |
+| Service | 业务逻辑核心，事务边界，可调用多个Repository | 禁止直接访问数据库 |
+| Repository | 数据访问层，封装SQL查询 | 禁止执行业务逻辑 |
+| Model | 数据模型定义，仅getter/setter | 禁止业务逻辑 |
+
+**禁止路径**：
+- ❌ Controller → Repository（应通过Service）
+- ❌ Repository → Service（直接查库返回实体）
+- ❌ Service → 直接使用JDBC/MyBatis
+- ✅ Controller → Service → Repository → Model
+
+### 后端约束
+
+| 约束项 | 规则 |
+|---------|------|
+| 事务边界 | Service层方法开启事务，Repository不开启 |
+| 参数校验 | Controller层使用@Valid注解校验 |
+| 异常处理 | Service层抛异常，Controller层统一捕获 |
+| 响应格式 | 统一 {code, message, data} JSON格式 |
+| 分页查询 | Repository支持但不含业务逻辑 |
+| 软删除 | 使用@Query手动写SQL，Service层处理 |
+| 日志记录 | 操作日志在Service层记录 |
+| 定时任务 | @Scheduled在Service层，不在Repository/Controller |
+
+### 前端约束
+
+| 约束项 | 规则 |
+|---------|------|
+| 目录结构 | views/页面、components/组件、api/接口、router/路由 |
+| 组件通信 | props down, events up，禁止直接修改props |
+| 状态管理 | 使用store保存全局状态，组件内状态用ref/reactive |
+| API调用 | 统一通过api/目录封装，禁止直接fetch/axios |
+| 样式隔离 | scoped styles + BEM命名 |
+| 路由懒加载 | 路由使用() => import()实现代码分割 |
+| 环境变量 | .env文件区分dev/prod |
+| 表单验证 | 使用el-form + async-validator |
+
+### 数据库约束
+
+| 约束项 | 规则 |
+|---------|------|
+| 实体命名 | 驼峰命名，数据库下划线映射 |
+| 软删除 | 使用deleted字段，Service层过滤 |
+| 索引 | 根据查询需求在Repository定义 |
+| 关联查询 | 优先用id关联，避免join |
+
+### 命名约束
+
+| 类型 | 命名规则 | 示例 |
+|------|----------|------|
+| Java类 | UpperCamelCase | DirectoryService |
+| Java方法 | lowerCamelCase | getChildDirectories() |
+| Java变量 | lowerCamelCase | currentParentId |
+| 数据库表 | 复数+下划线 | directories, files |
+| Vue组件 | PascalCase | DirectoryManager.vue |
+| Vue方法 | lowerCamelCase | handleNodeClick |
+| API路径 | RESTful风格 | /api/directory/create |
 
 ## 启动
 
 1. `git pull origin main`
 2. 创建 worktree：`git worktree add -b feature/issue-{N} .claude/worktrees/issue-{N} main`
-3. 复制 stages/pipeline-state-template.md → .claude/pipeline-state.md，填入 Task + 技术栈 + 架构约束
-4. 复制 stages/pipeline-log-template.md → .claude/pipeline-log.md
+3. 复制 stages/pipeline-state-template.md → .claude/pipeline-state-{ISSUE名称}.md，ISSUE名称提取用户需要开发的问题名称  在文件中填入 Task + 技术栈 + 架构约束
+4. 复制 stages/pipeline-log-template.md → .claude/pipeline-log-{ISSUE名称}.md
 5. 记录 Pipeline 版本到 state
+
 
 ## 阶段
 
@@ -111,7 +196,7 @@ understand → design → [review] → plan → [review] → implement → [revi
 ## 断点续跑
 
 session 中断后重新启动：
-1. 读 pipeline-state.md 的 Current Stage
+1. 读 pipeline-state-{ISSUE名称}.md 的 Current Stage
 2. 从该阶段重新执行（已完成阶段产出保留）
 3. 日志标注"恢复执行"
 

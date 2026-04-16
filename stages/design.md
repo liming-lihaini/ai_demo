@@ -27,7 +27,7 @@
    - 选择一个，给出理由（引用项目实际情况，如"因为已有 Redis"而非"因为性能好"）
    - 记录否决项和否决原因
 
-2. 写 ADR（docs/current/decisions/adr-{issue}-{topic}.md），格式：
+2. 写 ADR（docs/{ISSUE名称}/decisions/adr-{topic}.md），格式：
    # ADR: {标题}
    ## 背景
    {为什么需要这个决策，引用 Issue/BRD 具体内容}
@@ -45,7 +45,7 @@
    ## 影响
    {对后续实现的影响，涉及哪些模块/文件}
 
-3. 更新 pipeline-state.md：
+3. 更新 pipeline-state-{ISSUE名称}.md：
    - Decisions 追加本阶段决策
    - References 添加 ADR 完整路径
 

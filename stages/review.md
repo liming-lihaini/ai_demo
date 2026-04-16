@@ -4,7 +4,7 @@
 
 ## 知识加载
 
-1. pipeline-state.md — 全部 section
+1. pipeline-state-{ISSUE名称}.md — 全部 section
 2. 被评审阶段的产出文件（Current Stage > 产出 中列出的完整路径）
 3. 本文件（评审方法）
 
@@ -16,7 +16,7 @@
 ### 1. Decisions 一致性
 **查什么**: 产出是否遵循所有已做决策？是否走了否决方案？
 **怎么查**:
-- 读 pipeline-state.md Decisions section，列出所有决策
+- 读 pipeline-state-{ISSUE名称}.md Decisions section，列出所有决策
 - 逐个检查产出中是否体现了决策的选择
 - 逐个检查产出中没有出现被否决的方案
 **通过标准**: 每个决策在产出中有体现，无否决方案出现
@@ -47,7 +47,7 @@
 **通过标准**: 下一阶段可以仅凭现有信息开始工作，无需额外澄清
 
 ### 5. 信息完整性
-**查什么**: pipeline-state.md 是否有足够信息让下一阶段开始？
+**查什么**: pipeline-state-{ISSUE名称}.md 是否有足够信息让下一阶段开始？
 **怎么查**:
 - Current Stage 的产出文件列表完整？
 - 自检结果已填充？
@@ -81,12 +81,12 @@
 
 [阻塞] (必须修复才能继续)
 1. {问题描述，含文件路径和具体位置}
-   → 关联: pipeline-state.md {section 名}
+   → 关联: pipeline-state-{ISSUE名称}.md {section 名}
    → 建议: {具体修复方向，不是泛泛的"改进一下"}
 
 [建议] (非阻塞改进)
 1. {改进建议}
-   → 关联: pipeline-state.md {section 名}
+   → 关联: pipeline-state-{ISSUE名称}.md {section 名}
 ```
 
 ## Verify

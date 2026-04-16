@@ -39,7 +39,7 @@
 
 **不触发**：内部重构（接口不变）、新增测试、修复 bug（除非揭示文档错误）
 
-7. 更新 pipeline-state.md Current Stage
+7. 更新 pipeline-state-{ISSUE名称}.md Current Stage
 
 ## 验证命令
 
