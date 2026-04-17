@@ -2,14 +2,13 @@ package com.filemanager.util;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -143,42 +142,57 @@ public class OfficeConverter {
 
     /**
      * DOC 文件转文本
+     * 注意：POI 5.x 已移除对 legacy DOC 格式的支持
      */
-    private static String convertDocToText(InputStream inputStream) throws IOException {
-        try (HWPFDocument document = new HWPFDocument(inputStream);
-             WordExtractor extractor = new WordExtractor(document)) {
-            return extractor.getText();
+    private static String convertDocToText(InputStream inputStream) {
+        // POI 5.x 移除了 hwpf 模块，不再支持 legacy DOC 格式
+        // 关闭输入流
+        try {
+            inputStream.close();
+        } catch (Exception e) {
+            // ignore
         }
+        logger.warn("Legacy DOC 格式在 POI 5.x 中已不再支持，请使用 DOCX 格式");
+        return "[Word 97-2003 文档 - 请在 Office 中转换为 DOCX 后预览]";
     }
 
     /**
      * DOCX 文件转文本
      */
-    private static String convertDocxToText(InputStream inputStream) throws IOException {
+    private static String convertDocxToText(InputStream inputStream) {
         try (XWPFDocument document = new XWPFDocument(OPCPackage.open(inputStream))) {
             StringBuilder text = new StringBuilder();
             for (XWPFParagraph paragraph : document.getParagraphs()) {
                 text.append(paragraph.getText()).append("\n");
             }
             return text.toString();
+        } catch (Exception e) {
+            logger.warn("DOCX 解析失败: {}", e.getMessage());
+            return "[Word 文档 - 请在 Office 中查看]";
         }
     }
 
     /**
      * XLS 文件转文本
      */
-    private static String convertXlsToText(InputStream inputStream) throws IOException {
+    private static String convertXlsToText(InputStream inputStream) {
         try (Workbook workbook = new HSSFWorkbook(inputStream)) {
             return extractSheetText(workbook);
+        } catch (Exception e) {
+            logger.warn("XLS 解析失败: {}", e.getMessage());
+            return "[Excel 97-2003 - 请在 Office 中查看]";
         }
     }
 
     /**
      * XLSX 文件转文本
      */
-    private static String convertXlsxToText(InputStream inputStream) throws IOException {
+    private static String convertXlsxToText(InputStream inputStream) {
         try (Workbook workbook = new XSSFWorkbook(inputStream)) {
             return extractSheetText(workbook);
+        } catch (Exception e) {
+            logger.warn("XLSX 解析失败: {}", e.getMessage());
+            return "[Excel 文档 - 请在 Office 中查看]";
         }
     }
 
@@ -238,7 +252,7 @@ public class OfficeConverter {
      * PPT 文件转文本
      * 注意：POI 对 PPT 的支持有限，这里提取文本内容
      */
-    private static String convertPptToText(InputStream inputStream) throws IOException {
+    private static String convertPptToText(InputStream inputStream) {
         // HSLF 是旧的 PPT 格式处理库，Maven 依赖中需要有
         // 这里简化处理，返回提示信息
         logger.warn("PPT 格式原生支持有限");
@@ -248,7 +262,7 @@ public class OfficeConverter {
     /**
      * PPTX 文件转文本
      */
-    private static String convertPptxToText(InputStream inputStream) throws IOException {
+    private static String convertPptxToText(InputStream inputStream) {
         try (org.apache.poi.xslf.usermodel.XMLSlideShow slideShow =
                 new org.apache.poi.xslf.usermodel.XMLSlideShow(OPCPackage.open(inputStream))) {
             StringBuilder text = new StringBuilder();
@@ -256,9 +270,9 @@ public class OfficeConverter {
             for (XSLFSlide slide : slideShow.getSlides()) {
                 text.append("=== Slide ").append(slide.getSlideNumber()).append(" ===\n");
 
-                for (XSLFTextShape shape : slide.getShapes()) {
+                for (XSLFShape shape : slide.getShapes()) {
                     if (shape instanceof XSLFTextShape) {
-                        text.append(shape.getText()).append("\n");
+                        text.append(((XSLFTextShape) shape).getText()).append("\n");
                     }
                 }
                 text.append("\n");

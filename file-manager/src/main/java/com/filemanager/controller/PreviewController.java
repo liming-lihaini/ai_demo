@@ -86,7 +86,7 @@ public class PreviewController {
      * GET /api/preview/pdf/{fileId}
      */
     @GetMapping("/pdf/{fileId}")
-    public ResponseEntity<byte[]> getPdfPreview(@PathVariable Long fileId) {
+    public ResponseEntity<?> getPdfPreview(@PathVariable Long fileId) {
         try {
             FileInfo fileInfo = fileService.getFileById(fileId)
                     .orElseThrow(() -> new RuntimeException("文件不存在"));
@@ -97,14 +97,14 @@ public class PreviewController {
 
             String format = fileInfo.getFormat().toLowerCase();
 
-            // PDF 直接返回二进制
+            // PDF 直接返回
             if (format.equals("pdf")) {
                 Resource resource = previewService.getPreviewContent(fileId);
                 return ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .contentType(MediaType.APPLICATION_PDF)
                         .header(HttpHeaders.CONTENT_DISPOSITION,
                                 "inline; filename=\"" + fileInfo.getName() + "\"")
-                        .body(resource.getContentAsByteArray());
+                        .body(resource);
             }
 
             // Office 文档转换为 HTML

@@ -30,7 +30,6 @@ public class FileController {
     @Autowired
     private FileService fileService;
 
-    private static final Long DEFAULT_USER_ID = 1L;
 
     /**
      * 上传文件

@@ -31,8 +31,8 @@ file-manager/                           # 主项目目录
 │       │   ├── main.js              # 前端入口
 │       │   ├── router/              # 路由配置
 │       │   ├── api/                 # 前端API调用
-│       │   ├── components/           # Vue组件 (空)
-│       │   ├── views/               # 页面视图 (空)
+│       │   ├── components/           # Vue组件
+│       │   ├── views/               # 页面视图
 │       │   └── assets/              # 静态资源
 │       ├── index.html
 │       ├── vite.config.js           # Vite配置

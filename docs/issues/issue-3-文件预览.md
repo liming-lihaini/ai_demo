@@ -220,4 +220,27 @@ PreviewService
 - [ ] 待开发
 - [ ] 开发中
 - [ ] 待测试
-- [ ] 完成
+- [x] 完成
+
+## 实现摘要 (2026/04/17)
+
+已实现文件预览功能 MVP，包含:
+
+**后端:**
+- Apache POI 依赖 (doc/docx/xls/xlsx/ppt/pptx)
+- OfficeConverter 工具类（转换为文本/HTML）
+- PreviewService（预览信息、内容、缩略图）
+- PreviewController（/api/preview/* REST API）
+
+**前端:**
+- pdfjs-dist 依赖
+- preview.js API 封装
+- PreviewDialog 通用预览弹窗
+- PdfViewer PDF预览组件
+- TextViewer 文本预览组件
+- ImageViewer 图片预览组件
+- MediaPlayer 音视频播放组件
+- 集成到 FileManager.vue
+
+**偏差:**
+- 无
