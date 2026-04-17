@@ -273,4 +273,38 @@ public class FileService {
 
         return storageService.getFullPath(fileInfo.getPath());
     }
+
+    /**
+     * 更新文件内容
+     * @param id 文件ID
+     * @param content 新的文件内容
+     */
+    @Transactional
+    public FileInfo updateContent(Long id, String content) {
+        Optional<FileInfo> opt = fileRepository.findById(id);
+        if (!opt.isPresent()) {
+            throw new RuntimeException("文件不存在");
+        }
+
+        FileInfo fileInfo = opt.get();
+
+        if (fileInfo.getDeleted() == 1) {
+            throw new RuntimeException("文件已删除");
+        }
+
+        // 覆盖磁盘文件内容
+        String filePath = storageService.getFullPath(fileInfo.getPath());
+        try {
+            java.nio.file.Files.writeString(java.nio.file.Paths.get(filePath), content,
+                java.nio.charset.StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException("保存文件失败: " + e.getMessage());
+        }
+
+        // 更新文件大小
+        fileInfo.setSize((long) content.getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
+        fileInfo.setUpdatedAt(LocalDateTime.now());
+
+        return fileRepository.save(fileInfo);
+    }
 }

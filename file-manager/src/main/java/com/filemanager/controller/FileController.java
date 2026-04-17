@@ -194,6 +194,22 @@ public class FileController {
     }
 
     /**
+     * 更新文件内容
+     * PUT /api/file/update-content
+     */
+    @PutMapping("/update-content")
+    public ResponseEntity<Map<String, Object>> updateContent(@RequestBody Map<String, Object> request) {
+        try {
+            Long id = Long.parseLong(request.get("id").toString());
+            String content = request.get("content").toString();
+            FileInfo fileInfo = fileService.updateContent(id, content);
+            return ResponseEntity.ok(buildSuccess(fileInfo));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(buildError(e.getMessage()));
+        }
+    }
+
+    /**
      * 根据扩展名确定 Content-Type
      */
     private String determineContentType(String format) {
