@@ -32,7 +32,7 @@
       :data="fileList"
       @selection-change="handleSelectionChange"
       style="width: 100%; margin-top: 20px;"
-      @row-click="handleRowClick"
+      @row-dblclick="handleRowDblClick"
     >
       <el-table-column type="selection" width="55" />
       <el-table-column label="文件名" min-width="200">
@@ -92,6 +92,15 @@
         <el-button type="danger" @click="confirmDelete">确认删除</el-button>
       </template>
     </el-dialog>
+
+    <!-- 预览对话框 -->
+    <PreviewDialog
+      v-if="previewFile"
+      v-model:visible="previewVisible"
+      :file-id="previewFile.id"
+      :file-name="previewFile.name"
+      :file-type="getFileType(previewFile.format)"
+    />
   </div>
 </template>
 
@@ -100,6 +109,7 @@ import { ref, onMounted } from 'vue'
 import { Search, Delete, Download } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import * as fileApi from '../api/file'
+import PreviewDialog from '../components/PreviewDialog.vue'
 
 const userId = ref(1)
 const parentId = ref(0)
@@ -107,6 +117,10 @@ const fileList = ref([])
 const searchKeyword = ref('')
 const selectedFiles = ref([])
 const selectedIds = ref([])
+
+// 预览相关
+const previewVisible = ref(false)
+const previewFile = ref(null)
 
 // 对话框状态
 const uploadDialogVisible = ref(false)
@@ -202,9 +216,30 @@ const handleSelectionChange = (selection) => {
   selectedIds.value = selection.map(f => f.id)
 }
 
-// 行点击
-const handleRowClick = (row) => {
-  // 可选：双击打开预览
+// 行双击打开预览
+const handleRowDblClick = (row) => {
+  previewFile.value = row
+  previewVisible.value = true
+}
+
+// 判断文件是否支持预览
+const isPreviewable = (format) => {
+  if (!format) return false
+  const previewFormats = ['pdf', 'txt', 'md', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'mp3', 'wav', 'mp4', 'avi', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
+  return previewFormats.includes(format.toLowerCase())
+}
+
+// 获取文件类型
+const getFileType = (format) => {
+  if (!format) return ''
+  const ext = format.toLowerCase()
+  if (['pdf'].includes(ext)) return 'pdf'
+  if (['txt', 'md'].includes(ext)) return 'text'
+  if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(ext)) return 'image'
+  if (['mp3', 'wav'].includes(ext)) return 'audio'
+  if (['mp4', 'avi'].includes(ext)) return 'video'
+  if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(ext)) return 'office'
+  return ''
 }
 
 // 下载
