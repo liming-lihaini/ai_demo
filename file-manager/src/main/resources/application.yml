@@ -6,7 +6,7 @@ spring:
     name: file-manager
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:db/fileManager.db
+    url: jdbc:sqlite:D:/file-manager-db/fileManager.db
     hikari:
       maximum-pool-size: 1
   servlet:
@@ -16,7 +16,7 @@ spring:
       max-request-size: 100MB
   web:
     resources:
-      static-locations: classpath:/static,file:./storage/files
+      static-locations: classpath:/static,file:D:/storage/files
 
 mybatis-plus:
   configuration:
@@ -27,9 +27,9 @@ mybatis-plus:
 
 # 存储配置
 storage:
-  path: ./storage/files
-  temp-path: ./storage/temp
-  cache-path: ./storage/cache
+  path: D:/storage/files
+  temp-path: D:/storage/temp
+  cache-path: D:/storage/cache
 
 # 应用配置
 app:
@@ -65,7 +65,7 @@ logging:
   level:
     com.filemanager: INFO
   file:
-    name: logs/file-manager.log
+    name: D:/file-manager-logs/file-manager.log
   pattern:
     console: "[%d{yyyy-MM-dd HH:mm:ss}] [%level] [%logger{36}] %msg"
     file: "[%d{yyyy-MM-dd HH:mm:ss}] [%level] [%logger{36}] %msg"

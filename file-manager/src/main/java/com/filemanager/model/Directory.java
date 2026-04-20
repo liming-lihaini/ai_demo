@@ -1,12 +1,14 @@
 package com.filemanager.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 目录
@@ -30,4 +32,7 @@ public class Directory {
 
     @TableLogic
     private Integer deleted;
+
+    @TableField(exist = false)
+    private List<Directory> children;
 }

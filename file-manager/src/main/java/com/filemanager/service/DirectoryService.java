@@ -1,5 +1,8 @@
 package com.filemanager.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.filemanager.model.Directory;
 import com.filemanager.repository.DirectoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class DirectoryService {
@@ -17,35 +21,34 @@ public class DirectoryService {
     @Autowired
     private DirectoryRepository directoryRepository;
 
-    /**
-     * 特殊字符禁止列表
-     */
     private static final String FORBIDDEN_CHARS = "/\\:*?\"<>|";
 
-    /**
-     * 获取用户当前的根目录
-     */
     public List<Directory> getRootDirectory(Long userId) {
-        return directoryRepository.getRootDirectory(userId);
+        QueryWrapper<Directory> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId)
+               .isNull("parent_id")
+               .eq("deleted", 0);
+        return directoryRepository.selectList(wrapper);
     }
 
-    /**
-     * 获取指定目录的子目录列表
-     */
     public List<Directory> getChildDirectories(Long parentId) {
-        return directoryRepository.findByParentIdAndDeletedOrderByCreatedAtDesc(parentId, 0);
+        QueryWrapper<Directory> wrapper = new QueryWrapper<>();
+        wrapper.eq("parent_id", parentId)
+               .eq("deleted", 0)
+               .orderByDesc("created_at");
+        return directoryRepository.selectList(wrapper);
     }
 
-    /**
-     * 创建目录
-     */
     @Transactional
     public Directory createDirectory(String name, Long parentId, Long userId) {
-        // 校验目录名
         validateDirectoryName(name);
 
-        // 校验名称唯一性
-        if (directoryRepository.existsByParentIdAndNameAndDeletedAndUserId(parentId, name, 0, userId)) {
+        QueryWrapper<Directory> wrapper = new QueryWrapper<>();
+        wrapper.eq("parent_id", parentId)
+               .eq("name", name)
+               .eq("deleted", 0)
+               .eq("user_id", userId);
+        if (directoryRepository.selectCount(wrapper) > 0) {
             throw new RuntimeException("当前目录下已存在同名目录，请修改后重试");
         }
 
@@ -57,30 +60,23 @@ public class DirectoryService {
         directory.setCreatedAt(LocalDateTime.now());
         directory.setUpdatedAt(LocalDateTime.now());
 
-        return directoryRepository.save(directory);
+        directoryRepository.insert(directory);
+        return directory;
     }
 
-    /**
-     * 更新目录（重命名或移动）
-     */
     @Transactional
     public Directory updateDirectory(Long id, String newName, Long newParentId) {
-        Optional<Directory> opt = directoryRepository.findById(id);
-        if (!opt.isPresent()) {
+        Directory directory = directoryRepository.selectById(id);
+        if (directory == null) {
             throw new RuntimeException("目录不存在");
         }
 
-        Directory directory = opt.get();
-
-        // 如果是重命名
         if (newName != null && !newName.isEmpty()) {
             validateDirectoryName(newName);
             directory.setName(newName);
         }
 
-        // 如果是移动
         if (newParentId != null) {
-            // 移动到自身或子目录不允许
             if (newParentId.equals(id)) {
                 throw new RuntimeException("不能将目录移动到自身");
             }
@@ -88,77 +84,87 @@ public class DirectoryService {
         }
 
         directory.setUpdatedAt(LocalDateTime.now());
-        return directoryRepository.save(directory);
+        directoryRepository.updateById(directory);
+        return directory;
     }
 
-    /**
-     * 删除目录（软删除，移入回收站）
-     */
     @Transactional
     public void deleteDirectory(Long id) {
-        Optional<Directory> opt = directoryRepository.findById(id);
-        if (!opt.isPresent()) {
+        Directory directory = directoryRepository.selectById(id);
+        if (directory == null) {
             throw new RuntimeException("目录不存在");
         }
 
-        Directory directory = opt.get();
-        directory.setDeleted(1); // 软删除
+        directory.setDeleted(1);
         directory.setUpdatedAt(LocalDateTime.now());
-        directoryRepository.save(directory);
+        directoryRepository.updateById(directory);
 
-        // 同时删除子目录（递归）
-        List<Directory> children = directoryRepository.findByParentIdAndDeletedOrderByCreatedAtDesc(id, 0);
+        List<Directory> children = getChildDirectories(id);
         for (Directory child : children) {
             deleteDirectory(child.getId());
         }
     }
 
-    /**
-     * 恢复目录（从回收站恢复）
-     */
     @Transactional
     public void restoreDirectory(Long id) {
-        Optional<Directory> opt = directoryRepository.findById(id);
-        if (!opt.isPresent()) {
+        Directory directory = directoryRepository.selectById(id);
+        if (directory == null) {
             throw new RuntimeException("目录不存在");
         }
 
-        Directory directory = opt.get();
-        directory.setDeleted(0); // 恢复
+        directory.setDeleted(0);
         directory.setUpdatedAt(LocalDateTime.now());
-        directoryRepository.save(directory);
+        directoryRepository.updateById(directory);
     }
 
-    /**
-     * 搜索目录
-     */
     public List<Directory> searchDirectories(String keyword, Long userId) {
-        return directoryRepository.searchByName(keyword, userId);
+        QueryWrapper<Directory> wrapper = new QueryWrapper<>();
+        wrapper.eq("deleted", 0)
+               .like("name", keyword)
+               .eq("user_id", userId);
+        return directoryRepository.selectList(wrapper);
     }
 
-    /**
-     * 获取目录树
-     */
     public List<Directory> getDirectoryTree(Long userId) {
-        List<Directory> result = new ArrayList<>();
-        List<Directory> roots = directoryRepository.getRootDirectory(userId);
+        List<Directory> allDirs = new ArrayList<>();
+        List<Directory> roots = getRootDirectory(userId);
         for (Directory root : roots) {
-            buildTree(root, result);
+            buildTree(root, allDirs);
+        }
+        // 转换为树结构
+        return buildTreeStructure(allDirs);
+    }
+
+    private List<Directory> buildTreeStructure(List<Directory> allDirs) {
+        // 按ID分组
+        Map<Long, Directory> dirMap = allDirs.stream()
+                .collect(Collectors.toMap(Directory::getId, d -> d));
+
+        List<Directory> result = new ArrayList<>();
+        for (Directory dir : allDirs) {
+            if (dir.getParentId() == null) {
+                result.add(dir);
+            } else {
+                Directory parent = dirMap.get(dir.getParentId());
+                if (parent != null) {
+                    if (parent.getChildren() == null) {
+                        parent.setChildren(new ArrayList<>());
+                    }
+                    parent.getChildren().add(dir);
+                }
+            }
         }
         return result;
     }
 
     private void buildTree(Directory directory, List<Directory> result) {
         result.add(directory);
-        List<Directory> children = directoryRepository.findByParentIdAndDeletedOrderByCreatedAtDesc(directory.getId(), 0);
+        List<Directory> children = getChildDirectories(directory.getId());
         for (Directory child : children) {
             buildTree(child, result);
         }
     }
 
-    /**
-     * 获取面包屑导航
-     */
     public List<Directory> getBreadcrumb(Long id) {
         List<Directory> breadcrumb = new ArrayList<>();
         buildBreadcrumb(id, breadcrumb);
@@ -166,9 +172,8 @@ public class DirectoryService {
     }
 
     private void buildBreadcrumb(Long id, List<Directory> breadcrumb) {
-        Optional<Directory> opt = directoryRepository.findById(id);
-        if (opt.isPresent()) {
-            Directory directory = opt.get();
+        Directory directory = directoryRepository.selectById(id);
+        if (directory != null) {
             breadcrumb.add(0, directory);
             if (directory.getParentId() != null) {
                 buildBreadcrumb(directory.getParentId(), breadcrumb);
@@ -176,9 +181,6 @@ public class DirectoryService {
         }
     }
 
-    /**
-     * 校验目录名
-     */
     private void validateDirectoryName(String name) {
         if (name == null || name.isEmpty()) {
             throw new RuntimeException("请输入目录名称");

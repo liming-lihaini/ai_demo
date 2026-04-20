@@ -16,12 +16,12 @@
           <span class="time-display">{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
         </div>
         <div class="audio-controls">
-          <el-button :icon="Backward" circle size="small" @click="skip(-10)" />
+          <el-button :icon="DArrowLeft" circle size="small" @click="skip(-10)" />
           <el-button :icon="isPlaying ? VideoPause : VideoPlay" circle size="large" @click="togglePlay" />
-          <el-button :icon="Forward" circle size="small" @click="skip(10)" />
+          <el-button :icon="DArrowRight" circle size="small" @click="skip(10)" />
         </div>
         <div class="volume-control">
-          <el-icon><Volume /></el-icon>
+          <el-icon><Mute /></el-icon>
           <el-slider v-model="volume" :min="0" :max="100" @change="handleVolumeChange" />
         </div>
       </div>
@@ -55,10 +55,10 @@
         </div>
         <el-button-group>
           <el-button :icon="Backward" size="small" @click="skip(-10)" />
-          <el-button :icon="Forward" size="small" @click="skip(10)" />
+          <el-button :icon="DArrowRight" size="small" @click="skip(10)" />
         </el-button-group>
         <div class="volume-control">
-          <el-icon><Volume /></el-icon>
+          <el-icon><Mute /></el-icon>
           <el-slider v-model="volume" :min="0" :max="100" style="width: 80px;" @change="handleVolumeChange" />
         </div>
         <el-button :icon="FullScreen" size="small" @click="toggleFullscreen" />
@@ -84,7 +84,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { VideoPlay, VideoPause, Backward, Forward, Volume, FullScreen } from '@element-plus/icons-vue'
+import { VideoPlay, VideoPause, DArrowLeft, DArrowRight, Mute, FullScreen } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps({

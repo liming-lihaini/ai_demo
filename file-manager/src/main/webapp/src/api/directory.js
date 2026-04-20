@@ -21,22 +21,33 @@ export function getChildDirectories(parentId) {
 /**
  * 创建目录
  */
-export function createDirectory(data) {
-  return fetch(`${baseUrl}/create?userId=${data.userId || 1}`, {
+export function createDirectory(name, parentId = null, userId = 1) {
+  return fetch(`${baseUrl}/create?userId=${userId}&parentId=${parentId || ''}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    body: JSON.stringify({ name, parentId })
   }).then(res => res.json())
 }
 
 /**
- * 更新目录
+ * 重命名目录
  */
-export function updateDirectory(data) {
+export function renameDirectory(id, name) {
   return fetch(`${baseUrl}/update`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    body: JSON.stringify({ id, name })
+  }).then(res => res.json())
+}
+
+/**
+ * 移动目录
+ */
+export function moveDirectory(id, parentId) {
+  return fetch(`${baseUrl}/update`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, parentId })
   }).then(res => res.json())
 }
 

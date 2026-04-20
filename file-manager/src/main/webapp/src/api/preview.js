@@ -44,10 +44,13 @@ export function getPdfPreview(fileId) {
  * @param {number} fileId 文件ID
  */
 export function getTextPreview(fileId) {
-    return request({
-        url: `/preview/text/${fileId}`,
-        method: 'get'
-    })
+    return fetch(`/api/preview/text/${fileId}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('加载失败')
+            }
+            return res.text()
+        })
 }
 
 /**

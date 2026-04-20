@@ -167,7 +167,10 @@ public class FileController {
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long id) {
         try {
-            FileInfo fileInfo = fileService.getFileById(id).orElseThrow(() -> new RuntimeException("文件不存在"));
+            FileInfo fileInfo = fileService.getFileById(id);
+            if (fileInfo == null) {
+                throw new RuntimeException("文件不存在");
+            }
 
             if (fileInfo.getDeleted() == 1) {
                 return ResponseEntity.badRequest().build();

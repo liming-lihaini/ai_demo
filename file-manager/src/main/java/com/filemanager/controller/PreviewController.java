@@ -60,8 +60,10 @@ public class PreviewController {
     @GetMapping("/content/{fileId}")
     public ResponseEntity<Resource> getPreviewContent(@PathVariable Long fileId) {
         try {
-            FileInfo fileInfo = fileService.getFileById(fileId)
-                    .orElseThrow(() -> new RuntimeException("文件不存在"));
+            FileInfo fileInfo = fileService.getFileById(fileId);
+            if (fileInfo == null) {
+                throw new RuntimeException("文件不存在");
+            }
 
             if (fileInfo.getDeleted() == 1) {
                 return ResponseEntity.badRequest().build();
@@ -88,8 +90,10 @@ public class PreviewController {
     @GetMapping("/pdf/{fileId}")
     public ResponseEntity<?> getPdfPreview(@PathVariable Long fileId) {
         try {
-            FileInfo fileInfo = fileService.getFileById(fileId)
-                    .orElseThrow(() -> new RuntimeException("文件不存在"));
+            FileInfo fileInfo = fileService.getFileById(fileId);
+            if (fileInfo == null) {
+                throw new RuntimeException("文件不存在");
+            }
 
             if (fileInfo.getDeleted() == 1) {
                 return ResponseEntity.badRequest().build();
@@ -125,8 +129,10 @@ public class PreviewController {
     @GetMapping("/text/{fileId}")
     public ResponseEntity<String> getTextPreview(@PathVariable Long fileId) {
         try {
-            FileInfo fileInfo = fileService.getFileById(fileId)
-                    .orElseThrow(() -> new RuntimeException("文件不存在"));
+            FileInfo fileInfo = fileService.getFileById(fileId);
+            if (fileInfo == null) {
+                throw new RuntimeException("文件不存在");
+            }
 
             if (fileInfo.getDeleted() == 1) {
                 return ResponseEntity.badRequest().build();
@@ -149,8 +155,10 @@ public class PreviewController {
     @GetMapping("/html/{fileId}")
     public ResponseEntity<String> getHtmlPreview(@PathVariable Long fileId) {
         try {
-            FileInfo fileInfo = fileService.getFileById(fileId)
-                    .orElseThrow(() -> new RuntimeException("文件不存在"));
+            FileInfo fileInfo = fileService.getFileById(fileId);
+            if (fileInfo == null) {
+                throw new RuntimeException("文件不存在");
+            }
 
             if (fileInfo.getDeleted() == 1) {
                 return ResponseEntity.badRequest().build();
@@ -173,8 +181,10 @@ public class PreviewController {
     @GetMapping("/thumb/{fileId}")
     public ResponseEntity<Resource> getThumbnail(@PathVariable Long fileId) {
         try {
-            FileInfo fileInfo = fileService.getFileById(fileId)
-                    .orElseThrow(() -> new RuntimeException("文件不存在"));
+            FileInfo fileInfo = fileService.getFileById(fileId);
+            if (fileInfo == null) {
+                throw new RuntimeException("文件不存在");
+            }
 
             if (fileInfo.getDeleted() == 1) {
                 return ResponseEntity.badRequest().build();

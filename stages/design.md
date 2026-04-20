@@ -27,7 +27,7 @@
    - 选择一个，给出理由（引用项目实际情况，如"因为已有 Redis"而非"因为性能好"）
    - 记录否决项和否决原因
 
-2. 写 ADR（docs/{issue编号}/decisions/adr-{topic}.md）在docs下通过issue创建目录进行归档，格式：
+2. 写 ADR（docs/decisions/adr-{topic}.md）在docs下通过issue创建目录进行归档，格式：
    # ADR: {标题}
    ## 背景
    {为什么需要这个决策，引用 Issue/BRD 具体内容}

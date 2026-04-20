@@ -39,7 +39,7 @@
 
 3. 标注可并行 Task：如果多个 Task 无硬依赖，标注"可并行"
 
-4. 写执行计划（docs/{issue编号}/plans/{YYYY-MM-DD}-{title}.md）在docs目录下创建issue目录，按issue进行归档，格式：
+4. 写执行计划（docs/plans/{YYYY-MM-DD}-{title}.md）在docs目录下创建issue目录，按issue进行归档，格式：
    # 执行计划: {Issue 标题}
    ## Task 1: {标题}
    做什么: {具体描述}

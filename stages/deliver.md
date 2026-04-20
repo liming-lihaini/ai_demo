@@ -12,7 +12,7 @@
    - `git diff --name-only` — 确认知识文件变更（如有）已包含在 diff 中
    - 如有未解决的 🔴 Open Questions → 暂停交付，升级人工
 
-2. 更新 Issue Summary（docs/issues/issue-{ISSUE名称}.md）：
+2. 更新 Issue Summary（docs/issues/issue-{issue编号}.md）：
    - 勾选 acceptance criteria
    - 记录实现摘要（做了什么、关键决策、与计划的偏差）
 
@@ -50,7 +50,7 @@
 - {如无偏差，写"无偏差"}
 ```
 
-5. PR 创建后，在 pipeline-state.md Deliver section 记录 PR 链接
+5. PR 创建后或者创建PR失败，在 pipeline-state-{issue编号}.md Deliver section 记录 PR 链接
 
 ## Verify
 

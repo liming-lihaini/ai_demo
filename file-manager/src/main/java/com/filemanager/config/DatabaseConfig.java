@@ -26,18 +26,19 @@ public class DatabaseConfig {
     @Bean
     public DataSource dataSource() {
         try {
-            Files.createDirectories(Paths.get("db"));
+            Files.createDirectories(Paths.get("D:/file-manager-db"));
         } catch (Exception e) {
             throw new RuntimeException("创建数据库目录失败", e);
         }
 
-        String dbPath = "db/fileManager.db";
+        String dbPath = "D:/file-manager-db/fileManager.db";
         File dbFile = new File(dbPath);
 
         if (!dbFile.exists()) {
             try {
                 File targetDb = new File("target/classes/db/fileManager.db");
                 if (targetDb.exists()) {
+                    Files.createDirectories(Paths.get("D:/file-manager-db"));
                     Files.copy(targetDb.toPath(), dbFile.toPath());
                 }
             } catch (Exception e) {

@@ -70,6 +70,6 @@ sssss
 ## 常见错误
 
 - ❌ "实现登录功能" → ✅ "实现用户登录，支持手机号+验证码和邮箱+密码两种方式"
-- ❌ References 里写 "见 decisions/README.md" → ✅ 直接写 "docs/issues/{issue编号}/decisions/adr.md"
+- ❌ References 里写 "见 decisions/README.md" → ✅ 直接写 "docs/issues/decisions/adr.md"
 - ❌ 跳过 Issue 类型判断 → ✅ 先判断类型再确定关注重点
 - ❌ 发现矛盾但不记录 → ✅ 记入 Open Questions，标注矛盾双方
