@@ -148,12 +148,15 @@ INDEX idx_user_id (user_id)
 
 | 接口 | 方法 | 路径 | 功能 |
 |------|------|------|------|
+| 获取根目录 | GET | /api/directory/root | 获取根目录 |
+| 获取子目录 | GET | /api/directory/children/{parentId} | 获取子目录列表 |
 | 创建目录 | POST | /api/directory/create | 创建目录 |
 | 更新目录 | PUT | /api/directory/update | 更新目录 |
-| 删除目录 | DELETE | /api/directory/delete | 删除目录 |
-| 目录列表 | GET | /api/directory/list | 目录列表 |
-| 目录树 | GET | /api/directory/tree | 目录树 |
+| 删除目录 | DELETE | /api/directory/delete/{id} | 删除目录 |
+| 恢复目录 | POST | /api/directory/restore/{id} | 恢复目录 |
 | 搜索目录 | GET | /api/directory/search | 搜索目录 |
+| 目录树 | GET | /api/directory/tree | 目录树 |
+| 面包屑 | GET | /api/directory/breadcrumb/{id} | 面包屑导航 |
 
 ### 业务规则
 
@@ -181,7 +184,7 @@ INDEX idx_user_id (user_id)
 
 ## 状态
 
-- [ ] 待开发
-- [ ] 开发中
-- [ ] 待测试
-- [ ] 完成
+- [x] 待开发
+- [x] 开发中
+- [x] 待测试
+- [x] 完成

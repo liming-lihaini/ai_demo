@@ -30,6 +30,8 @@
 
 ## Act
 
+> 执行 `/pipeline-load plan` 进行知识加载
+
 1. 拆分为独立 Task：
    - 每个 Task 有明确边界（不与其他 Task 重叠）
    - 每个 Task 有可检查的验收条件（见下方标准）

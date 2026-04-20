@@ -27,6 +27,8 @@ sssss
 
 ## Act
 
+> 执行 `/pipeline-load understand` 进行知识加载
+
 1. 写入 pipeline-state-{issue编号}.md：
 
 **Task section**:

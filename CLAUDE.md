@@ -159,10 +159,11 @@ understand → design → [review] → plan → [review] → implement → [revi
 对每个阶段：
 
 1. 读 pipeline-state.md 确认当前阶段
-2. 准备子 agent prompt：
+2. **知识加载**：执行 `/pipeline-load {阶段名}` 加载阶段知识和规则知识
+3. 准备子 agent prompt：
    - 如当前阶段不是 understand → 读 state References section，提取完整文件路径列表
    - understand 阶段不需要知识文件列表
-3. 创建子 agent：
+4. 创建子 agent：
    ```
    [{阶段名} agent] {Issue 标题}
 
@@ -170,15 +171,15 @@ understand → design → [review] → plan → [review] → implement → [revi
    知识文件: {上一步提取的文件路径，逗号分隔}
    完成后严格遵循 stage 文件执行。
    ```
-4. 等子 agent 完成
-5. **Self-review（必须执行，不可跳过）**：
+5. 等子 agent 完成
+6. **Self-review（必须执行，不可跳过）**：
    按 stages/logging-guide.md 的双轨评估执行：
    - 轨道 A: SR-0 ~ SR-8（流程合规）
    - 轨道 B: QR-0 ~ QR-3（产出质量）
    每项写"合规"或"偏差: {具体描述}"。
    全部 SR + QR 结果写入日志"验证"段。
    **如果日志中缺少 SR 或 QR section，视为本阶段未完成。**
-6. 如需 review → 创建 review 子 agent：
+7. 如需 review → 创建 review 子 agent：
    ```
    [review agent] {被评审阶段} - {Issue 标题}
 
@@ -186,19 +187,20 @@ understand → design → [review] → plan → [review] → implement → [revi
    完成后严格遵循 stage 文件执行
    ```
    **主 agent 职责**：review 完成后，主 agent 将评审结论写入 pipeline-state-{issue名称}.md Current Stage > 评审 section（状态、轮次、反馈）
-7. review 不通过 → 反馈写入 state → 修复 → 最多重试 2 次 → 人工介入
-8. 子 agent 失败 → 重试 1 次 → 仍失败 → 人工介入
-9. Boundaries 冲突 → 停止
-10. 写日志（按 stages/logging-guide.md）
-11. **SR/QR 偏差处理**：如果 SR 偏差 ≥ 3 项，或 QR 偏差 ≥ 2 项，暂停并升级人工介入。否则记录偏差，继续下一阶段
-12. 更新 state → 下一阶段
+8. review 不通过 → 反馈写入 state → 修复 → 最多重试 2 次 → 人工介入
+9. 子 agent 失败 → 重试 1 次 → 仍失败 → 人工介入
+10. Boundaries 冲突 → 停止
+11. 写日志（按 stages/logging-guide.md）
+12. **SR/QR 偏差处理**：如果 SR 偏差 ≥ 3 项，或 QR 偏差 ≥ 2 项，暂停并升级人工介入。否则记录偏差，继续下一阶段
+13. 更新 state → 下一阶段
 
 ## 断点续跑
 
 session 中断后重新启动：
 1. 读 pipeline-state-{issue编号}.md 的 Current Stage
-2. 从该阶段重新执行（已完成阶段产出保留）
-3. 日志标注"恢复执行"
+2. **知识加载**：执行 `/pipeline-load {阶段名}` 加载阶段知识和规则知识
+3. 从该阶段重新执行（已完成阶段产出保留）
+4. 日志标注"恢复执行"
 
 ## 异常处理
 

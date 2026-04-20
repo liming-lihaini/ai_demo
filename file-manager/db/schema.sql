@@ -71,3 +71,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_username ON users(username);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_directory_name_parent ON directories(name, parent_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_file_name_parent ON files(name, parent_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_file_md5_parent ON files(md5, parent_id);
+
+
+ALTER TABLE files ADD COLUMN delete_at TIMESTAMP;
+ALTER TABLE directories ADD COLUMN delete_at TIMESTAMP;

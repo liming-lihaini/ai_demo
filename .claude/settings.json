@@ -10,11 +10,19 @@
   },
   "skills": {
     "create_prd": {
-      "path": "skills/create_prd",
+      "path": "skills/create_prd/SKILL.md",
       "enabled": true
     },
     "prd_2_trd": {
-      "path": "skills/prd_for_trd",
+      "path": "skills/prd_for_trd/SKILL.md",
+      "enabled": true
+    },
+    "pipeline-load": {
+      "path": "skills/pipeline-load/SKILL.md",
+      "enabled": true
+    },
+    "pipeline-cleanup": {
+      "path": "commands/pipeline-cleanup.md",
       "enabled": true
     }
   }

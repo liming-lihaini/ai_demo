@@ -181,10 +181,14 @@ PreviewService
 
 | 接口 | 方法 | 路径 | 功能 |
 |------|------|------|------|
-| 预览URL | GET | /api/preview/url/{fileId} | 获取预览URL |
-| 预览文件 | GET | /api/preview/file/{fileId} | 获取预览内容 |
-| 文件转换 | POST | /api/preview/convert | Office转PDF |
+| 预览信息 | GET | /api/preview/{fileId} | 获取文件预览信息 |
+| 预览内容 | GET | /api/preview/content/{fileId} | 获取预览内容 |
+| PDF预览 | GET | /api/preview/pdf/{fileId} | PDF文件预览 |
+| 文本预览 | GET | /api/preview/text/{fileId} | 文本文件预览 |
+| HTML预览 | GET | /api/preview/html/{fileId} | HTML预览 |
 | 缩略图 | GET | /api/preview/thumb/{fileId} | 获取缩略图 |
+| 大图预览 | GET | /api/preview/large/{fileId} | 大图加载 |
+| 批量预览 | GET | /api/preview/batch | 批量获取预览信息 |
 
 ### 业务规则
 

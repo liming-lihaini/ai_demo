@@ -198,12 +198,15 @@ INDEX idx_md5_parent (md5, parent_id)  -- MD5去重
 | 接口 | 方法 | 路径 | 功能 |
 |------|------|------|------|
 | 上传文件 | POST | /api/file/upload | 上传文件 |
-| 更新文件 | PUT | /api/file/update | 更新文件信息 |
-| 删除文件 | DELETE | /api/file/delete | 删除文件 |
 | 文件列表 | GET | /api/file/list | 文件列表 |
-| 下载文件 | GET | /api/file/download | 下载文件 |
-| 批量下载 | GET | /api/file/batch-download | 批量下载ZIP |
 | 搜索文件 | GET | /api/file/search | 搜索文件 |
+| 删除文件 | DELETE | /api/file/delete/{id} | 删除文件 |
+| 批量删除 | DELETE | /api/file/delete-batch | 批量删除 |
+| 恢复文件 | POST | /api/file/restore/{id} | 恢复文件 |
+| 重命名 | PUT | /api/file/rename | 重命名文件 |
+| 移动文件 | PUT | /api/file/move | 移动文件 |
+| 下载文件 | GET | /api/file/download/{id} | 下载文件 |
+| 更新内容 | PUT | /api/file/update-content | 更新文件内容（MD编辑） |
 
 ### 业务规则
 
@@ -230,7 +233,7 @@ INDEX idx_md5_parent (md5, parent_id)  -- MD5去重
 
 ## 状态
 
-- [ ] 待开发
-- [ ] 开发中
-- [ ] 待测试
-- [ ] 完成
+- [x] 待开发
+- [x] 开发中
+- [x] 待测试
+- [x] 完成

@@ -159,10 +159,10 @@ public void autoCleanExpiredItems() {
 
 | 接口 | 方法 | 路径 | 功能 |
 |------|------|------|------|
-| 回收站列表 | GET | /api/trash/list | 获取回收站列表 |
-| 恢复文件 | POST | /api/trash/restore/{id} | 恢复文件/目录 |
-| 清空回收站 | DELETE | /api/trash/empty | 清空全部 |
-| 触发清理 | POST | /api/trash/auto-clean | 手动触发清理 |
+| 回收站列表 | GET | /api/trash | 获取回收站列表 |
+| 恢复 | POST | /api/trash/{id}/restore | 恢复文件/目录 |
+| 永久删除 | DELETE | /api/trash/{id} | 永久删除 |
+| 清空回收站 | DELETE | /api/trash/clear | 清空全部 |
 
 ### 业务规则
 

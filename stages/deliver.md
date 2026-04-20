@@ -4,6 +4,8 @@
 
 ## Act
 
+> 执行 `/pipeline-load deliver` 进行知识加载
+
 1. 最终验证：
    - `make test && make lint` — 必须零错误（代码交付）
    - 如无 Makefile（pipeline/文档交付）：跳过 make 命令，改为人工检查文件内容和格式
