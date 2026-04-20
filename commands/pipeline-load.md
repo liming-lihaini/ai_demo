@@ -60,6 +60,6 @@
 
 ## 完成确认
 
-1. 复述 pipeline-state-{issue}.md 的 Task、Boundaries、上一阶段产出（Handoff 检查）
+1. 复述 pipeline-state-{issue编号}.md 的 Task、Boundaries、上一阶段产出（Handoff 检查）
 2. 确认已加载的知识足以执行本阶段任务
-3. 如有缺失，记入 pipeline-state-{issue}.md Open Questions 并说明原因
+3. 如有缺失，记入 pipeline-state-{issue编号}.md Open Questions 并说明原因
