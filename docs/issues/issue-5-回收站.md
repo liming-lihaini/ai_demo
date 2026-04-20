@@ -195,7 +195,30 @@ public void autoCleanExpiredItems() {
 
 ## 状态
 
-- [ ] 待开发
-- [ ] 开发中
-- [ ] 待测试
-- [ ] 完成
+- [x] 待开发
+- [x] 开发中
+- [x] 待测试
+- [x] 完成
+
+## 实现摘要
+
+### 完成的实现
+1. FileInfo 和 Directory 模型添加 `deleteAt` 字段
+2. FileService 删除方法设置 `deleteAt` 时间戳
+3. DirectoryService 删除方法设置 `deleteAt` 时间戳
+4. TrashService 实现回收站核心业务逻辑：
+   - getTrashList: 获取回收站列表
+   - restore: 恢复文件/目录
+   - permanentDelete: 永久删除
+   - clearTrash: 清空回收站
+   - cleanExpiredItems: 定时清理（每天凌晨2点，30天过期）
+5. TrashController 实现 API 接口：/api/trash
+
+### 技术决策
+- 采用软删除方案，使用 `deleted` + `deleteAt` 字段
+- 定时任务使用 `@Scheduled(cron = "0 0 2 * * ?")` 每天凌晨2点执行
+- API 路径使用 `/api/trash` 前缀，符合 RESTful 风格
+- 遵循 CLAUDE.md 架构约束：Controller → Service → Repository → Model
+
+### 与计划的偏差
+- 无重大偏差

@@ -33,6 +33,8 @@ public class Directory {
     @TableLogic
     private Integer deleted;
 
+    private LocalDateTime deleteAt;
+
     @TableField(exist = false)
     private List<Directory> children;
 }
