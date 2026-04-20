@@ -199,6 +199,7 @@ public void autoCleanExpiredItems() {
 - [x] 开发中
 - [x] 待测试
 - [x] 完成
+- [x] 已关闭 (2026/04/20) via PR #7
 
 ## 实现摘要
 
