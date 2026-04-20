@@ -125,6 +125,7 @@ public class FileService {
         }
 
         fileInfo.setDeleted(1);
+        fileInfo.setDeleteAt(LocalDateTime.now());
         fileInfo.setUpdatedAt(LocalDateTime.now());
         fileRepository.updateById(fileInfo);
     }
@@ -136,6 +137,7 @@ public class FileService {
             FileInfo fileInfo = fileRepository.selectById(id);
             if (fileInfo != null) {
                 fileInfo.setDeleted(1);
+                fileInfo.setDeleteAt(now);
                 fileInfo.setUpdatedAt(now);
                 fileRepository.updateById(fileInfo);
             }
@@ -150,6 +152,7 @@ public class FileService {
         }
 
         fileInfo.setDeleted(0);
+        fileInfo.setDeleteAt(null);
         fileInfo.setUpdatedAt(LocalDateTime.now());
         fileRepository.updateById(fileInfo);
     }

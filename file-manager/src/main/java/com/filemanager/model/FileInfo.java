@@ -38,4 +38,6 @@ public class FileInfo {
 
     @TableLogic
     private Integer deleted;
+
+    private LocalDateTime deleteAt;
 }

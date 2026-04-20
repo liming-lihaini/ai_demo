@@ -96,6 +96,7 @@ public class DirectoryService {
         }
 
         directory.setDeleted(1);
+        directory.setDeleteAt(LocalDateTime.now());
         directory.setUpdatedAt(LocalDateTime.now());
         directoryRepository.updateById(directory);
 
@@ -113,6 +114,7 @@ public class DirectoryService {
         }
 
         directory.setDeleted(0);
+        directory.setDeleteAt(null);
         directory.setUpdatedAt(LocalDateTime.now());
         directoryRepository.updateById(directory);
     }
