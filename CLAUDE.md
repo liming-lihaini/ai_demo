@@ -190,7 +190,12 @@ understand → design → [review] → plan → [review] → implement → [revi
 8. review 不通过 → 反馈写入 state → 修复 → 最多重试 2 次 → 人工介入
 9. 子 agent 失败 → 重试 1 次 → 仍失败 → 人工介入
 10. Boundaries 冲突 → 停止
-11. 写日志（按 stages/logging-guide.md）
+11. **写日志（按 stages/logging-guide.md）**
+   - 所有阶段日志**统一写入一个文件**：`.claude/pipeline-log-{issue编号}.md`
+   - 每个阶段日志用**两个空行**分隔
+   - 日志必须包含所有 5 个阶段：understand → design → plan → implement → deliver
+   - **验证日志完整性**：确保每个阶段都有日志，缺失则暂停并补写
+   - design/plan/implement 阶段必须包含规则知识（rulers/*.md）检查结果
 12. **SR/QR 偏差处理**：如果 SR 偏差 ≥ 3 项，或 QR 偏差 ≥ 2 项，暂停并升级人工介入。否则记录偏差，继续下一阶段
 13. 更新 state → 下一阶段
 
@@ -198,9 +203,11 @@ understand → design → [review] → plan → [review] → implement → [revi
 
 session 中断后重新启动：
 1. 读 pipeline-state-{issue编号}.md 的 Current Stage
-2. **知识加载**：执行 `/pipeline-load {阶段名}` 加载阶段知识和规则知识
-3. 从该阶段重新执行（已完成阶段产出保留）
-4. 日志标注"恢复执行"
+2. **验证日志完整性**：检查所有 5 个阶段日志是否都存在于 `.claude/pipeline-log-{issue编号}.md`
+   - 如有缺失，在缺失阶段标注"补写原因"，然后补写
+3. **知识加载**：执行 `/pipeline-load {阶段名}` 加载阶段知识和规则知识
+4. 从该阶段重新执行（已完成阶段产出保留）
+5. 日志标注"恢复执行"
 
 ## 异常处理
 
