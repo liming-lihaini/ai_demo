@@ -6,6 +6,18 @@
 const baseUrl = '/api/file'
 
 /**
+ * 创建 Markdown 文件（带模板内容）
+ * @param {string} name - 文件名
+ * @param {number} parentId - 父目录ID
+ * @param {number} userId - 用户ID
+ */
+export function createMdFile(name, parentId = 0, userId = 1) {
+  return fetch(`${baseUrl}/create-md?name=${encodeURIComponent(name)}&parentId=${parentId}&userId=${userId}`, {
+    method: 'POST'
+  }).then(res => res.json())
+}
+
+/**
  * 上传文件
  * @param {File} file - 文件对象
  * @param {number} parentId - 父目录ID

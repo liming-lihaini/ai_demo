@@ -33,11 +33,14 @@ public class SearchIndexService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private StorageService storageService;
+
     /**
      * 同步文件索引
-     * 每5分钟执行一次
+     * 每5分钟执行一次，启动延迟10秒
      */
-    @Scheduled(fixedRate = 5 * 60 * 1000)
+    @Scheduled(fixedRate = 5 * 60 * 1000, initialDelay = 10000)
     @Transactional
     public void syncFileIndex() {
         log.info("开始同步文件索引...");
@@ -72,9 +75,9 @@ public class SearchIndexService {
 
     /**
      * 同步目录索引
-     * 每5分钟执行一次
+     * 每5分钟执行一次，启动延迟10秒
      */
-    @Scheduled(fixedRate = 5 * 60 * 1000)
+    @Scheduled(fixedRate = 5 * 60 * 1000, initialDelay = 10000)
     @Transactional
     public void syncDirectoryIndex() {
         log.info("开始同步目录索引...");
@@ -114,8 +117,21 @@ public class SearchIndexService {
             return null;
         }
 
-        // 读取文件内容（简化实现，实际应读取文件）
-        // TODO: 实现读取本地文件内容
+        // 读取实际文件内容
+        try {
+            String fullPath = storageService.getFullPath(file.getPath());
+            java.nio.file.Path path = java.nio.file.Paths.get(fullPath);
+            if (java.nio.file.Files.exists(path)) {
+                // 限制内容长度，避免索引过大
+                String content = java.nio.file.Files.readString(path, java.nio.charset.StandardCharsets.UTF_8);
+                if (content.length() > 10000) {
+                    content = content.substring(0, 10000);
+                }
+                return content;
+            }
+        } catch (Exception e) {
+            log.warn("读取文件内容失败: {}", file.getPath(), e);
+        }
         return null;
     }
 

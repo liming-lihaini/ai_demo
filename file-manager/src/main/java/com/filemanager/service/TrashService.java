@@ -45,8 +45,8 @@ public class TrashService {
         // 查询已删除的文件
         QueryWrapper<FileInfo> fileWrapper = new QueryWrapper<>();
         fileWrapper.eq("user_id", userId)
-                   .eq("deleted", 1)
-                   .orderByDesc("delete_at");
+                  .eq("deleted", 1)
+                  .orderByDesc("delete_at");
         List<FileInfo> deletedFiles = fileRepository.selectList(fileWrapper);
 
         for (FileInfo file : deletedFiles) {
@@ -195,7 +195,7 @@ public class TrashService {
         // 永久删除所有已删除的文件
         QueryWrapper<FileInfo> fileWrapper = new QueryWrapper<>();
         fileWrapper.eq("user_id", userId)
-                   .eq("deleted", 1);
+                  .eq("deleted", 1);
         List<FileInfo> deletedFiles = fileRepository.selectList(fileWrapper);
         for (FileInfo file : deletedFiles) {
             permanentDeleteFile(file.getId());
@@ -223,7 +223,7 @@ public class TrashService {
         // 查询并删除过期的文件
         QueryWrapper<FileInfo> fileWrapper = new QueryWrapper<>();
         fileWrapper.eq("deleted", 1)
-                   .lt("delete_at", threshold);
+                  .lt("delete_at", threshold);
         List<FileInfo> expiredFiles = fileRepository.selectList(fileWrapper);
         for (FileInfo file : expiredFiles) {
             try {

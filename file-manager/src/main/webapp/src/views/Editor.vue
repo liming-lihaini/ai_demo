@@ -30,17 +30,57 @@ import { ElMessage } from 'element-plus'
 import { FolderChecked, Back } from '@element-plus/icons-vue'
 import { updateFileContent } from '../api/fileContent'
 import { getTextPreview } from '../api/preview'
+import { uploadFile } from '../api/file'
 
 const route = useRoute()
 const router = useRouter()
 
 const fileId = ref(route.query.id)
+const fileName = ref(route.query.name || '')
+const parentId = ref(route.query.parentId || 0)
 const saving = ref(false)
 const previewContent = ref('')
 const editorPaneRef = ref(null)
 let easyMDE = null
 
+// 新建文件
+const createNewFile = async () => {
+  if (!fileName.value) {
+    ElMessage.error('缺少文件名')
+    return false
+  }
+
+  try {
+    // 创建空文件
+    const emptyContent = new Blob([''], { type: 'text/plain' })
+    emptyContent.lastModified = new Date()
+    emptyContent.name = fileName.value
+
+    const res = await uploadFile(emptyContent, parentId.value, 1)
+    if (res && res.code === 0 && res.data) {
+      fileId.value = res.data.id
+      return true
+    } else {
+      ElMessage.error(res?.message || '创建文件失败')
+      return false
+    }
+  } catch (e) {
+    console.error('创建文件失败:', e)
+    ElMessage.error('创建文件失败')
+    return false
+  }
+}
+
 const initEditor = async () => {
+  // 如果没有文件ID但有文件名，先创建文件
+  if (!fileId.value && fileName.value) {
+    const success = await createNewFile()
+    if (!success) {
+      ElMessage.error('创建文件失败')
+      return
+    }
+  }
+
   if (!fileId.value) {
     ElMessage.error('缺少文件ID')
     return

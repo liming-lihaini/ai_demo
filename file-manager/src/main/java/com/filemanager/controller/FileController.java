@@ -51,6 +51,25 @@ public class FileController {
     }
 
     /**
+     * 创建 Markdown 文件
+     * POST /api/file/create-md
+     */
+    @PostMapping("/create-md")
+    public ResponseEntity<Map<String, Object>> createMdFile(
+            @RequestParam("name") String name,
+            @RequestParam(value = "parentId", required = false, defaultValue = "0") Long parentId,
+            @RequestParam(value = "userId", required = false, defaultValue = "1") Long userId) {
+
+        try {
+            Long actualParentId = (parentId == null || parentId == 0) ? null : parentId;
+            FileInfo fileInfo = fileService.createMdFile(name, actualParentId, userId);
+            return ResponseEntity.ok(buildSuccess(fileInfo));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(buildError(e.getMessage()));
+        }
+    }
+
+    /**
      * 获取文件列表
      * GET /api/file/list?parentId=1&userId=1
      */

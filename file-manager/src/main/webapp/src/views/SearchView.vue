@@ -112,12 +112,13 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { search, getSearchHistory, saveSearchHistory, clearSearchHistory } from '../api/search'
 
 const router = useRouter()
+const route = useRoute()
 
 const searchKeyword = ref('')
 const loading = ref(false)
@@ -136,9 +137,14 @@ const filters = ref({
   maxSize: null
 })
 
-// 加载搜索历史
+// 加载搜索历史和URL参数
 onMounted(() => {
   searchHistory.value = getSearchHistory()
+  // 从URL读取搜索关键词
+  if (route.query.q) {
+    searchKeyword.value = route.query.q
+    handleSearch()
+  }
 })
 
 // 输入防抖
@@ -230,9 +236,13 @@ const formatSize = (bytes) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
-// 点击文件行
+// 点击文件行 - 打开编辑器
 const handleFileClick = (row) => {
-  router.push({ path: '/files', query: { parentId: row.parentId } })
+  if (row.format === 'md') {
+    router.push({ path: '/editor', query: { id: row.id } })
+  } else {
+    router.push({ path: '/files', query: { parentId: row.parentId } })
+  }
 }
 
 // 点击目录行

@@ -633,16 +633,16 @@ const confirmCreateMd = async () => {
   }
   const name = newMdName.value.endsWith('.md') ? newMdName.value : newMdName.value + '.md'
 
-  // 创建空的MD文件
-  const content = '# ' + newMdName.value.replace('.md', '') + '\n\n'
   try {
-    // 通过更新内容来创建文件
-    // 这里需要先创建一个空文件记录，然后编辑
-    ElMessage.info('请在编辑器中编辑内容后保存')
-    createMdVisible.value = false
-
-    // 跳转到编辑器创建新文件
-    router.push({ path: '/editor', query: { parentId: currentDirId.value || 0, name: name } })
+    // 调用后端API创建带模板的MD文件
+    const res = await fileApi.createMdFile(name, currentDirId.value || 0, 1)
+    if (res && res.code === 0 && res.data) {
+      createMdVisible.value = false
+      // 跳转到编辑器编辑
+      router.push({ path: '/editor', query: { id: res.data.id, parentId: currentDirId.value || 0, name: name } })
+    } else {
+      ElMessage.error(res?.message || '创建失败')
+    }
   } catch (e) {
     ElMessage.error('创建失败')
   }

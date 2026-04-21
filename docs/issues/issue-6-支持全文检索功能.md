@@ -201,7 +201,7 @@ GET /api/search?q=关键词&type=file|directory|all&fileType=doc,docx&startDate=
 - [ ] 待开发
 - [ ] 开发中
 - [ ] 待测试
-- [ ] 完成
+- [x] 完成
 
 ## 实现摘要
 

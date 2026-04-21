@@ -95,10 +95,13 @@ public class DirectoryService {
             throw new RuntimeException("目录不存在");
         }
 
-        directory.setDeleted(1);
-        directory.setDeleteAt(LocalDateTime.now());
-        directory.setUpdatedAt(LocalDateTime.now());
-        directoryRepository.updateById(directory);
+        // 使用原生 SQL 更新，绕过逻辑删除
+        LocalDateTime now = LocalDateTime.now();
+        directoryRepository.update(null, new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<Directory>()
+            .eq("id", id)
+            .set("deleted", 1)
+            .set("delete_at", now)
+            .set("updated_at", now));
 
         List<Directory> children = getChildDirectories(id);
         for (Directory child : children) {

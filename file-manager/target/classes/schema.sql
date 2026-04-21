@@ -71,3 +71,64 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_username ON users(username);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_directory_name_parent ON directories(name, parent_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_file_name_parent ON files(name, parent_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_file_md5_parent ON files(md5, parent_id);
+
+
+ALTER TABLE files ADD COLUMN delete_at TIMESTAMP;
+ALTER TABLE directories ADD COLUMN delete_at TIMESTAMP;
+
+
+-- 文件全文检索虚拟表
+CREATE VIRTUAL TABLE IF NOT EXISTS file_fts USING fts5(
+    name,
+    content,
+    content='files',
+    content_rowid='id'
+);
+
+-- 目录全文检索虚拟表
+CREATE VIRTUAL TABLE IF NOT EXISTS directory_fts USING fts5(
+    name,
+    content='directories',
+    content_rowid='id'
+);
+
+
+-- 文件 INSERT 触发器
+CREATE TRIGGER IF NOT EXISTS file_ai AFTER INSERT ON files BEGIN
+    INSERT INTO file_fts(rowid, name, content)
+    VALUES (new.id, new.name, '');
+END;
+
+-- 文件 DELETE 触发器
+CREATE TRIGGER IF NOT EXISTS file_ad AFTER DELETE ON files BEGIN
+    INSERT INTO file_fts(file_fts, rowid, name, content)
+    VALUES('delete', old.id, old.name, '');
+END;
+
+-- 文件 UPDATE 触发器
+CREATE TRIGGER IF NOT EXISTS file_au AFTER UPDATE ON files BEGIN
+    INSERT INTO file_fts(file_fts, rowid, name, content)
+    VALUES('delete', old.id, old.name, '');
+    INSERT INTO file_fts(rowid, name, content)
+    VALUES (new.id, new.name, '');
+END;
+
+-- 目录 INSERT 触发器
+CREATE TRIGGER IF NOT EXISTS directory_ai AFTER INSERT ON directories BEGIN
+    INSERT INTO directory_fts(rowid, name)
+    VALUES (new.id, new.name);
+END;
+
+-- 目录 DELETE 触发器
+CREATE TRIGGER IF NOT EXISTS directory_ad AFTER DELETE ON directories BEGIN
+    INSERT INTO directory_fts(directory_fts, rowid, name)
+    VALUES('delete', old.id, old.name);
+END;
+
+-- 目录 UPDATE 触发器
+CREATE TRIGGER IF NOT EXISTS directory_au AFTER UPDATE ON directories BEGIN
+    INSERT INTO directory_fts(directory_fts, rowid, name)
+    VALUES('delete', old.id, old.name);
+    INSERT INTO directory_fts(rowid, name)
+    VALUES (new.id, new.name);
+END;

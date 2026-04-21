@@ -114,6 +114,47 @@ public class StorageService {
     }
 
     /**
+     * 计算字符串内容的 MD5 值
+     */
+    public String calculateMD5FromContent(String content) throws IOException {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] bytes = content.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            md.update(bytes);
+            return HexFormat.of().formatHex(md.digest());
+        } catch (Exception e) {
+            throw new IOException("计算内容MD5失败", e);
+        }
+    }
+
+    /**
+     * 保存 Markdown 文件内容
+     * @param content 文件内容
+     * @param userId 用户ID
+     * @param baseName 不带扩展名的文件名
+     * @return 存储后的相对路径
+     */
+    public String saveMdFile(String content, Long userId, String baseName) throws IOException {
+        // 创建用户目录: storagePath/year/month/day/
+        LocalDate today = LocalDate.now();
+        String datePath = String.format("%d/%02d/%02d/", today.getYear(), today.getMonthValue(), today.getDayOfMonth());
+
+        // 确保目录存在
+        Path dirPath = Paths.get(storagePath, userId.toString(), datePath);
+        Files.createDirectories(dirPath);
+
+        // 生成文件名
+        String fileName = generateUniqueFileName(baseName + ".md", dirPath);
+
+        // 保存文件
+        Path filePath = dirPath.resolve(fileName);
+        Files.writeString(filePath, content, java.nio.charset.StandardCharsets.UTF_8);
+
+        // 返回相对路径（用于数据库存储）
+        return userId + "/" + datePath + fileName;
+    }
+
+    /**
      * 删除文件
      * @param relativePath 相对存储路径
      */

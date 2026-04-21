@@ -67,6 +67,74 @@ public class FileService {
         return fileInfo;
     }
 
+    private static final String MD_TEMPLATE = "# %s\n\n" +
+            "## 概述\n\n" +
+            "<!-- 在此描述文档的主要内容 -->\n\n" +
+            "## 主要内容\n\n" +
+            "### 第一章\n\n\n\n" +
+            "### 第二章\n\n\n\n" +
+            "## 总结\n\n" +
+            "<!-- 在此总结文档要点 -->\n\n" +
+            "---\n" +
+            "*最后更新: %s*\n";
+
+    /**
+     * 创建 Markdown 文件（带模板内容）
+     * @param name 文件名
+     * @param parentId 父目录ID
+     * @param userId 用户ID
+     * @return 创建的文件信息
+     */
+    @Transactional
+    public FileInfo createMdFile(String name, Long parentId, Long userId) throws IOException {
+        // 验证文件名
+        if (name == null || name.isEmpty()) {
+            throw new IOException("文件名不能为空");
+        }
+
+        // 确保有 .md 扩展名
+        if (!name.toLowerCase().endsWith(".md")) {
+            name = name + ".md";
+        }
+
+        // 提取文件名作为标题
+        String title = name.replaceAll("\\.md$", "");
+
+        // 生成模板内容
+        String content = String.format(MD_TEMPLATE, title, LocalDateTime.now().toLocalDate().toString());
+
+        // 检查同名文件是否存在
+        QueryWrapper<FileInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("parent_id", parentId)
+               .eq("name", name)
+               .eq("deleted", 0)
+               .eq("user_id", userId);
+        if (fileRepository.selectCount(wrapper) > 0) {
+            throw new IOException("当前目录下已存在同名文件");
+        }
+
+        // 保存到存储目录
+        String relativePath = storageService.saveMdFile(content, userId, name.replace(".md", ""));
+
+        // 提取扩展名
+        String ext = getExtension(name);
+
+        FileInfo fileInfo = new FileInfo();
+        fileInfo.setName(name);
+        fileInfo.setFormat(ext);
+        fileInfo.setSize((long) content.getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
+        fileInfo.setMd5(storageService.calculateMD5FromContent(content));
+        fileInfo.setPath(relativePath);
+        fileInfo.setParentId(parentId);
+        fileInfo.setUserId(userId);
+        fileInfo.setDeleted(0);
+        fileInfo.setCreatedAt(LocalDateTime.now());
+        fileInfo.setUpdatedAt(LocalDateTime.now());
+
+        fileRepository.insert(fileInfo);
+        return fileInfo;
+    }
+
     private void validateFile(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             throw new IOException("文件不能为空");
@@ -124,23 +192,25 @@ public class FileService {
             throw new RuntimeException("文件不存在");
         }
 
-        fileInfo.setDeleted(1);
-        fileInfo.setDeleteAt(LocalDateTime.now());
-        fileInfo.setUpdatedAt(LocalDateTime.now());
-        fileRepository.updateById(fileInfo);
+        // 使用原生 SQL 更新，绕过逻辑删除
+        LocalDateTime now = LocalDateTime.now();
+        fileRepository.update(null, new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<FileInfo>()
+            .eq("id", id)
+            .set("deleted", 1)
+            .set("delete_at", now)
+            .set("updated_at", now));
     }
 
     @Transactional
     public void deleteFiles(List<Long> ids) {
         LocalDateTime now = LocalDateTime.now();
         for (Long id : ids) {
-            FileInfo fileInfo = fileRepository.selectById(id);
-            if (fileInfo != null) {
-                fileInfo.setDeleted(1);
-                fileInfo.setDeleteAt(now);
-                fileInfo.setUpdatedAt(now);
-                fileRepository.updateById(fileInfo);
-            }
+            // 使用原生 SQL 更新
+            fileRepository.update(null, new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<FileInfo>()
+                .eq("id", id)
+                .set("deleted", 1)
+                .set("delete_at", now)
+                .set("updated_at", now));
         }
     }
 

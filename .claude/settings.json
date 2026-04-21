@@ -22,7 +22,11 @@
       "enabled": true
     },
     "pipeline-cleanup": {
-      "path": "commands/pipeline-cleanup.md",
+      "path": "skills/pipeline-cleanup/SKILL.md",
+      "enabled": true
+    },
+    "pipeline-eval": {
+      "path": "skills/pipeline-eval/SKILL.md",
       "enabled": true
     }
   }
